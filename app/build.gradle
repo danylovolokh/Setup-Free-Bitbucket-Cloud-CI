@@ -6,8 +6,10 @@ android {
         applicationId "mots_mockup.comarch.com.setupbitbucketcloudci"
         minSdkVersion 22
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+
+        versionName versionNameValue
+        versionCode versionCodeValue
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

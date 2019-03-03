@@ -22,6 +22,11 @@ allprojects {
     }
 }
 
+ext {
+    versionCodeValue = 9999
+    versionNameValue = "debugApplication"
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
