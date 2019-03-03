@@ -8,7 +8,7 @@ build_info_json_filepath = ""
 current_branch = ""
 date = ""
 
-# >> field from build_info.json
+# >> fields from build_info.json
 build_number = ""
 build_date = ""
 previous_build_tag = ""
@@ -18,7 +18,7 @@ application_version = ""
 application_name = ""
 previous_build_date = ""
 build_tag = ""
-# << field from build_info.json
+# << fields from build_info.json
 
 
 def get_current_git_branch():
@@ -141,37 +141,6 @@ def update_build_number():
     global build_number
     build_number = str(int(build_number) + 1)
     print("update_build_number, new build_number %s" % build_number)
-
-# Creates the Git tag using the info prepared by prepareTag(), tags the Git repo
-# using the tag, and then pushes the tag
-def tag_branch():
-  # os.chdir(gitRoot)
-  print(">> tag_branch %s Git repo with %s" % (repoName, gitTag))
-  sys.stdout.flush()
-
-  gitExec = ["git", "tag", "-a", "-f", "-m"]
-  msg = "%s tag %s build " % (repoName, gitPrefix)
-  msg += "%s.%s number %s" % (gitLabel, current_branch, buildNumber)
-
-  gitExec.append(msg)
-  gitExec.append(gitTag)
-
-  print("tag_branch, tagging")
-  errorMessage = "git tag failed"
-  callExec(gitExec, quiet=False, continuous=False, err=errorMessage, redirect="")
-
-  print("tag_branch, pushing")
-  gitExec = ["git", "push"]
-  errorMessage = "git push failed"
-  callExec(gitExec, quiet=False, continuous=False, err=errorMessage, redirect="")
-
-  print("tag_branch, force pushing")
-  gitExec = ["git", "push", "--force"]
-  errorMessage = "git push --force failed"
-  callExec(gitExec, quiet=False, continuous=False, err=errorMessage, redirect="")
-  # os.chdir(root)
-  print("<< tag_branch")
-  return
 
 def check_not_empty(var, var_name):
   try:
