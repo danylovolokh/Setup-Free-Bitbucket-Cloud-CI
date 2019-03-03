@@ -180,6 +180,11 @@ def push_changes():
     error_message = "git push tag failed"
     execute_command(error_message, git_push_tag_exec)
 
+    print("push_changes, force pushing")
+    git_exec_push_force = ["git", "push", "--force"]
+    error_message = "git push --force failed"
+    execute_command(error_message, git_exec_push_force)
+
     print("<< push_changes")
 
 
