@@ -1,0 +1,11 @@
+{
+"build_number":"0",
+"build_date":"none",
+"previous_build_date":"none",
+"application_name":"ApplicationName",
+"application_version":"1.0",
+"build_tag":"none",
+"previous_build_tag":"none",
+"repo_url":"repo_url_here",
+"git_branch":"master"
+}
