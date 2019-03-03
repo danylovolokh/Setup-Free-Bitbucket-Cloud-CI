@@ -159,6 +159,8 @@ def execute_command(error_message, git_commit):
     try:
 
         codeproc = subprocess.Popen(git_commit, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = codeproc.stdout.read().decode("utf-8").strip()
+        print(result)
 
     except Exception as e:
         print(error_message)
