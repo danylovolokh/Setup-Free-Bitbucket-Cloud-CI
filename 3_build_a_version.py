@@ -1,0 +1,1 @@
+print ("Dummy file. Please call './gradlew assembleRelease' from outside of this file for better logs")
