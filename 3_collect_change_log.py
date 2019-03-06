@@ -208,12 +208,15 @@ def main(argv):
     code_proc = subprocess.Popen(git_change_log, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output_text = code_proc.stdout.read().decode("utf-8").strip()
 
-    with open("change_log_external.txt", "w+") as output:
+    external_file_name = "change_log_external.txt"
+
+    with open(external_file_name, "w+") as output:
         output.write("External\n\n")
         output.write(output_text)
         output.close()
 
-    with open("change_log_internal.txt", "w+") as output:
+    internal_file_name = "change_log_internal.txt"
+    with open(internal_file_name, "w+") as output:
         output.write("Internal\n\n")
         output.write(output_text)
         output.close()

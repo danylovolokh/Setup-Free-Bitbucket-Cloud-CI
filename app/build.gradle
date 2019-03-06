@@ -1,7 +1,17 @@
 apply plugin: 'com.android.application'
 
+
+def signingPropertiesFile = new File('./signing/playstore.properties')
+def keystoreProperties = new Properties()
+if (signingPropertiesFile && signingPropertiesFile.isFile()) {
+    println "test signingPropertiesFile.isFile()"
+    keystoreProperties.load(new FileInputStream(signingPropertiesFile))
+}
+
 android {
+
     compileSdkVersion 28
+
     defaultConfig {
         applicationId "mots_mockup.comarch.com.setupbitbucketcloudci"
         minSdkVersion 22
@@ -18,6 +28,39 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    signingConfigs {
+        debug {
+
+        }
+        release {
+            def keystoreFilePath = "${rootDir}/signing/${keystoreProperties['storeFile']}"
+            storeFile = file(keystoreFilePath)
+            storePassword = keystoreProperties['storePassword']
+            keyAlias = keystoreProperties['keyAlias']
+            keyPassword = keystoreProperties['keyPassword']
+        }
+    }
+
+    flavorDimensions 'External','Internal'
+
+    productFlavors {
+
+        production {
+            dimension 'External'
+            ext.betaDistributionReleaseNotes = "change_log_external.txt"
+            ext.betaDistributionApkFilePath = "${buildDir}/outputs/apk/internal/release/app-external-release.apk"
+            ext.betaDistributionGroupAliases = "testing-group-setup-ci"
+        }
+
+        qa {
+            dimension 'Internal'
+            ext.betaDistributionReleaseNotes = "change_log_internal.txt"
+            ext.betaDistributionApkFilePath = "${buildDir}/outputs/apk/external/release/app-internal-release.apk"
+            ext.betaDistributionGroupAliases = "testing-group-setup-ci"
+        }
+    }
+
 }
 
 dependencies {
