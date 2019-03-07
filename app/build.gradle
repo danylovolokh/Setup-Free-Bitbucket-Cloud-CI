@@ -42,19 +42,18 @@ android {
         }
     }
 
-    flavorDimensions 'External','Internal'
-
+    flavorDimensions "default"
     productFlavors {
 
-        production {
-            dimension 'External'
+        external {
+            dimension "default"
             ext.betaDistributionReleaseNotes = "change_log_external.txt"
             ext.betaDistributionApkFilePath = "${buildDir}/outputs/apk/internal/release/app-external-release.apk"
             ext.betaDistributionGroupAliases = "testing-group-setup-ci"
         }
 
-        qa {
-            dimension 'Internal'
+        internal {
+            dimension "default"
             ext.betaDistributionReleaseNotes = "change_log_internal.txt"
             ext.betaDistributionApkFilePath = "${buildDir}/outputs/apk/external/release/app-internal-release.apk"
             ext.betaDistributionGroupAliases = "testing-group-setup-ci"
