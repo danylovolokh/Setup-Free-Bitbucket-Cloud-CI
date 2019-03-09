@@ -23,8 +23,8 @@ allprojects {
 }
 
 ext {
-    versionCodeValue = 9999
-    versionNameValue = "debugApplication"
+    versionCodeValue = 9
+    versionNameValue = "1.0.9"
 }
 
 task clean(type: Delete) {
