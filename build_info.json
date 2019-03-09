@@ -1,11 +1,11 @@
 {
-"build_number":"10",
-"build_date":"2019-03-09 21:43",
-"previous_build_date":"2019-03-09 22:36",
+"build_number":"11",
+"build_date":"2019-03-09 21:53",
+"previous_build_date":"2019-03-09 21:43",
 "application_name":"SetupBitbucketCloudCI",
 "application_version":"1.0",
-"build_tag":"SetupBitbucketCloudCI/1.0/10",
-"previous_build_tag":"SetupBitbucketCloudCI/1.0/9",
+"build_tag":"SetupBitbucketCloudCI/1.0/11",
+"previous_build_tag":"SetupBitbucketCloudCI/1.0/10",
 "repo_url":"ssh://git@bitbucket.org:DanyloVolokh/setupbitbucketcloudci.git",
 "git_branch":"master"
 }
