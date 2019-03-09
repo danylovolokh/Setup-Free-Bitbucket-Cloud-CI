@@ -3,8 +3,6 @@ import sys
 import time
 import Utils
 
-build_info_json_filepath = ""
-current_branch = ""
 date = ""
 
 # >> fields from build_info.json
@@ -105,8 +103,7 @@ def update_build_info_json():
 def main(argv):
   print (">> main")
 
-  global build_info_json_filepath, \
-      build_number, \
+  global build_number, \
       build_date, \
       previous_build_tag, \
       repo_url, \
@@ -115,15 +112,12 @@ def main(argv):
       application_name, \
       previous_build_date, \
       build_tag, \
-      current_branch, \
       date
 
   sys.stdout.flush()
 
   build_info = Utils.get_build_info()
 
-  build_info_json_filepath  = build_info.build_info_json_filepath
-  current_branch            = build_info.current_branch
   date                      = build_info.date
 
 # >> fields from build_info.json

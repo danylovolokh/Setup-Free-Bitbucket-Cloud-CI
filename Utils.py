@@ -4,7 +4,6 @@ import json
 import subprocess
 import time
 
-build_info_json_filepath = ""
 current_branch = ""
 date = ""
 
@@ -31,7 +30,6 @@ def check_not_empty(var, var_name):
 def parse_build_info():
     print (">> parse_build_info")
 
-    global build_info_json_filepath
     global \
         build_number, \
         build_date, \
@@ -143,7 +141,6 @@ def get_build_info():
 
     set_current_date()
 
-    build_info.build_info_json_filepath = build_info_json_filepath
     build_info.current_branch = current_branch
     build_info.date = date
 
@@ -163,7 +160,6 @@ class BuildInfo:
     def __init__(self):
         pass
 
-    build_info_json_filepath = ""
     current_branch = ""
     date = ""
 
