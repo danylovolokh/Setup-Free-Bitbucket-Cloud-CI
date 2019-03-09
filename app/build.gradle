@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 
-def signingPropertiesFile = new File('./signing/playstore.properties')
+def signingPropertiesFile = new File('./signing_info_from_another_repo/playstore.properties')
 def keystoreProperties = new Properties()
 if (signingPropertiesFile && signingPropertiesFile.isFile()) {
     println "test signingPropertiesFile.isFile()"

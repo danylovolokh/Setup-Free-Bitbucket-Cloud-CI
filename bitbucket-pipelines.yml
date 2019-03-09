@@ -1,0 +1,78 @@
+pipelines:
+  custom:
+    manual_configuration:
+      - step:
+          name: Build a version
+          image: java:8
+          caches:
+            - gradle
+            - android-sdk
+            - pip
+          script:
+
+            # Download and unzip android sdk
+            - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
+            - unzip -o -qq android-sdk.zip -d android-sdk
+
+            # Define Android Home and add PATHs
+            - export ANDROID_HOME="/opt/atlassian/pipelines/agent/build/android-sdk"
+            - export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
+
+            # Download packages.
+            - yes | sdkmanager "platform-tools"
+            - yes | sdkmanager "platforms;android-27"
+            - yes | sdkmanager "build-tools;27.0.3"
+            - yes | sdkmanager "extras;android;m2repository"
+            - yes | sdkmanager "extras;google;m2repository"
+            - yes | sdkmanager "extras;google;instantapps"
+            - yes | sdkmanager --licenses
+
+            # Install python
+            - echo "Install python"
+            - apt-get update
+            - apt-get install python-pip -q -y
+
+            # Give write access
+            - chmod a+x ./gradlew
+
+            # Clean the project
+            - ./gradlew clean
+
+            # Download signing key
+            - echo "Download signing key"
+            - git config --file=.gitmodules submodule.signing_info_from_another_repo.url https://$BITBUCKET_USER:$BITBUCKET_PASS@bitbucket.org/$BITBUCKET_USER/$SIGNING_REPO_NAME.git
+            - git submodule sync
+            - git submodule update --init signing
+
+            # Setup correct origin url
+            - git config -e
+            - git config --global user.email "v.danylo@gmail.com"
+            - git config --global user.name "Danylo Volokh Pipeline"
+            - git config remote.origin.url https://$BITBUCKET_USER:$BITBUCKET_PASS@bitbucket.org/$BITBUCKET_ACCOUNT/$GIT_REPO_NAME.git
+
+            # Change build version
+            - echo "Change build version"
+            - python 1_change_build_version.py
+
+            # Update application version in gradle file
+            - echo "Change build version"
+            - python 2_update_gradle_build_version.py
+
+            # Change build version after successful build
+            - echo "Commit build version"
+            - python 3_commit_build_version.py
+
+            # Collect change log
+            - echo "Collect change log"
+            - python 4_collect_change_log.py
+
+            # Build apk
+            - ./gradlew assembleRelease # crashlyticsUploadDistributionExternalRelease crashlyticsUploadDistributionInternalRelease -Dorg.gradle.parallel=false
+
+            # Upload apk files to bitbucket cloud Downloads folder
+            - echo "Upload apk files to bitbucket cloud Downloads folder"
+            - python 6_upload_apk_file_to_bitbucket_downloads.py
+
+definitions:
+    caches:
+      android-sdk: android-sdk
