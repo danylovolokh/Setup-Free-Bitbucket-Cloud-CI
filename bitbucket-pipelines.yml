@@ -39,10 +39,10 @@ pipelines:
             - ./gradlew clean
 
             # Download signing key
-            - echo "Download signing key"
-            - git config --file=.gitmodules submodule.signing_info_from_another_repo.url https://$BITBUCKET_USER:$BITBUCKET_PASS@bitbucket.org/$BITBUCKET_USER/$SIGNING_REPO_NAME.git
-            - git submodule sync
-            - git submodule update --init signing
+#            - echo "Download signing key"
+#            - git config --file=.gitmodules submodule.signing_info_from_another_repo.url https://$BITBUCKET_USER:$BITBUCKET_PASS@bitbucket.org/$BITBUCKET_USER/$SIGNING_REPO_NAME.git
+#            - git submodule sync
+#            - git submodule update --init signing_info_from_another_repo
 
             # Setup correct origin url
             - git config -e
@@ -67,11 +67,11 @@ pipelines:
             - python 4_collect_change_log.py
 
             # Build apk
-            - ./gradlew assembleRelease # crashlyticsUploadDistributionExternalRelease crashlyticsUploadDistributionInternalRelease -Dorg.gradle.parallel=false
+            - ./gradlew assembleDebug # crashlyticsUploadDistributionExternalRelease crashlyticsUploadDistributionInternalRelease -Dorg.gradle.parallel=false
 
             # Upload apk files to bitbucket cloud Downloads folder
-            - echo "Upload apk files to bitbucket cloud Downloads folder"
-            - python 6_upload_apk_file_to_bitbucket_downloads.py
+#            - echo "Upload apk files to bitbucket cloud Downloads folder"
+#            - python 6_upload_apk_file_to_bitbucket_downloads.py
 
 definitions:
     caches:
