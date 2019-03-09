@@ -105,8 +105,7 @@ def update_build_info_json():
 def main(argv):
   print (">> main")
 
-  global build_info_json_filepath
-  global \
+  global build_info_json_filepath, \
       build_number, \
       build_date, \
       previous_build_tag, \
