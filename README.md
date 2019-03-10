@@ -10,11 +10,11 @@ At the time of writting (10.03.2019) **bitbucket cloud offers you a free 50 buil
 3. Commit and push changes to the repository
 4. Collect a change log
 5. Build the application
-6. Upload the apk files to the storage for future usage.
 
 Additional steps:
 
-7. Sign the application with the "release" signing key.
+6. Sign the application with the "release" signing key.
+7. Upload the apk files to the storage for future usage.
 8. Upload a version to the Fabric Beta for testing purposes.
 
 ## 1. Update build number, build version name etc...
@@ -116,3 +116,97 @@ External
 "Fix files that were committed by mistake"
 "Update upload to Downloads"
 ```
+
+## 5. Build the application
+Now we are ready to build a "debug" version with bitbucket CI.
+In order to build the "debug" version we need to call "./gradlew assembleDebug"
+
+# Setup Bitbucket pipelines.
+References:
+- [Get started with Bitbucket Pipelines](https://confluence.atlassian.com/bitbucket/get-started-with-bitbucket-pipelines-792298921.html) 
+- [Configure bitbucket-pipelines.yml](https://confluence.atlassian.com/bitbucket/configure-bitbucket-pipelines-yml-792298910.html)
+
+In order to setup bitbucket pipelines you need to add *bitbucket-pipelines.yml* file to the root of the project.
+```
+pipelines:
+  custom:
+    manual_configuration:
+      - step:
+          name: Build a version
+          image: java:8
+          caches:
+            - gradle
+            - android-sdk
+            - pip
+          script:
+
+            # Download and unzip android sdk
+            - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
+            - unzip -o -qq android-sdk.zip -d android-sdk
+
+            # Define Android Home and add PATHs
+            - export ANDROID_HOME="/opt/atlassian/pipelines/agent/build/android-sdk"
+            - export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
+
+            # Download packages.
+            - yes | sdkmanager "platform-tools"
+            - yes | sdkmanager "platforms;android-27"
+            - yes | sdkmanager "build-tools;27.0.3"
+            - yes | sdkmanager "extras;android;m2repository"
+            - yes | sdkmanager "extras;google;m2repository"
+            - yes | sdkmanager "extras;google;instantapps"
+            - yes | sdkmanager --licenses
+
+            # Install python
+            - echo "Install python"
+            - apt-get update
+            - apt-get install python-pip -q -y
+
+            # Give write access
+            - chmod a+x ./gradlew
+
+            # Clean the project
+            - ./gradlew clean
+
+            # Setup correct origin url
+            - git config -e
+            - git config --global user.email "v.danylo@gmail.com"
+            - git config --global user.name "Danylo Volokh Pipeline"
+            - git config remote.origin.url https://$BITBUCKET_USER:$BITBUCKET_PASS@bitbucket.org/$BITBUCKET_ACCOUNT/$GIT_REPO_NAME.git
+
+            # Change build version
+            - echo "Update info json"
+            - python 1_update_build_info_json.py
+
+            # Update application version in gradle file
+            - echo "Change build version"
+            - python 2_update_gradle_build_version.py
+
+            # Change build version after successful build
+            - echo "Commit build version"
+            - python 3_commit_build_version.py
+
+            # Collect change log
+            - echo "Collect change log"
+            - python 4_collect_change_log.py
+
+            # Build apk
+            - ./gradlew assembleDebug
+
+definitions:
+    caches:
+      android-sdk: android-sdk
+```
+
+Then you have to "Enable Bitbucket in the Settings of your account.
+![alt tag](https://user-images.githubusercontent.com/2686355/54084947-8df32180-4340-11e9-9991-8133f939394a.gif)
+
+You also need to add a few variables to the Pipelines variables
+- BITBUCKET_USER - user which has access to write to the master branch
+- BITBUCKET_PASS - pasword to this user (password will be encrypted and hidden from everyone else)
+- BITBUCKET_ACCOUNT - account on which the repository is stored
+- GIT_REPO_NAME - name of the repository
+
+![alt tag](https://user-images.githubusercontent.com/2686355/54085140-00650100-4343-11e9-8e1a-f60a952f41b7.png)
+
+## Now you are ready to build the "debug" version with Bitbucket Pipelines
