@@ -209,7 +209,7 @@ definitions:
       android-sdk: android-sdk
 ```
 
-Then you have to "Enable Bitbucket in the Settings of your account "Settings > Pipelines".
+Then you have to enable Bitbucket Pipelines in the Settings of your account "Settings > Pipelines".
 
 ![alt tag](https://user-images.githubusercontent.com/2686355/54084947-8df32180-4340-11e9-9991-8133f939394a.gif)
 
@@ -223,7 +223,8 @@ The values above will be used to access the git repository.
 
 ![alt tag](https://user-images.githubusercontent.com/2686355/54085140-00650100-4343-11e9-8e1a-f60a952f41b7.png)
 
-# Now you are ready to build the "debug" version with Bitbucket Pipelines
+Now you are ready to build the "debug" version with Bitbucket Pipelines
+
 # Additional steps
 ## 6. Sign the application with the "release" signing key.
 
@@ -237,14 +238,14 @@ In order to download the signing key into the repository only for the builds wit
 storeFile=keystore_file
 storePassword=store_password
 keyAlias=key
-keyPassword=jeyPassword
+keyPassword=keyPassword
 ```
 "*keystore_file*":
 This is a keystore file with your signing key.
 
 ![alt_tag](https://user-images.githubusercontent.com/2686355/54085385-3788e180-4346-11e9-8e2b-13c065c95e92.png)
 
-2. Now we have to add this repository as a git submodule.
+2. Now we have to add this repository as a git submodule. Call the following command in the main repository.
 > git submodule add <url> signing_info_from_another_repository
     
 3. Add signing configuration to the "*app/build.gradle file*"
@@ -282,7 +283,7 @@ android {
 ```
 4. Update *bitbucket-pipelines.yml* file:
 
-Add following code which will clone the Signing Configuration for the build:
+Add following code which will clone the signing configuration for the build:
 ```
 # Download signing key
 - echo "Download signing key"
@@ -360,19 +361,22 @@ definitions:
     caches:
       android-sdk: android-sdk
 ```
-# Now you are ready to build the "release" version with Bitbucket Pipelines
-# Additional steps
+
+Now you are ready to build the "release" version with Bitbucket Pipelines
+
 ## 7. Upload the apk files to the storage for future usage.
 
-We can use the Downloadds folder of bitbucket cloud to keep the artifacts of our build.
+We can use the Downloads folder of bitbucket cloud to keep the artifacts of our build.
 ### To upload the apk files of all the flavors we need to execute python script *6_upload_apk_file_to_bitbucket_downloads.py*
+> The file *6_upload_apk_file_to_bitbucket_downloads.py* is located in the root of the project.
 
+[Publish and link your build artifacts](https://confluence.atlassian.com/bitbucket/publish-and-link-your-build-artifacts-872137736.html)
 This file used default bitbucket API to upload files into the repository.
 In order to do that we need:
 
 1. Add one Environment variable to the Account Setting (not the repository settings)
 ![alt_tag](https://user-images.githubusercontent.com/2686355/54085723-a451ab00-4349-11e9-8a8e-d0c60c5454d7.png)
-- BB_AUTH_STRING - this variabel consists from the account and password separated by the colon ":"
+- BB_AUTH_STRING - this variable consists from the account and password separated by the colon ":"
 
 2. Call "*6_upload_apk_file_to_bitbucket_downloads.py*" from *bitbucket-pipelines.yml*
 Here is an updated *bitbucket-pipelines.yml* file:
@@ -441,3 +445,53 @@ Here is how uploaded files look like in the storage
 ![alt_tag](https://user-images.githubusercontent.com/2686355/54090405-8c474f00-437c-11e9-869a-93a72e280afa.png)
 
 ## 8. Upload a version to the Fabric Beta for testing purposes.
+
+In order to upload a version to Fabric Beta you need to setup the Fabric Beta first.
+
+- [Install Crashlytics via Gradle](https://fabric.io/kits/android/crashlytics/install)
+- [Beta Instalation](https://docs.fabric.io/android/beta/installation.html)
+
+If you already upload the files to the Fabric Beta we need to add 2 more changes to the configuration:
+
+1. Change the *bitbucket-pipelines.yml* 
+add "crashlyticsUploadDistributionExternalRelease crashlyticsUploadDistributionInternalRelease -Dorg.gradle.parallel=false" after the "assembleRelease"
+
+> - ./gradlew assembleRelease crashlyticsUploadDistributionExternalRelease crashlyticsUploadDistributionInternalRelease -Dorg.gradle.parallel=false
+
+2. Change the *app/build.gradle* 
+We need to add the correct "Release Notes" with every flavor that we upload
+
+```
+flavorDimensions "default"
+productFlavors {
+
+    external {
+        dimension "default"
+        ext.betaDistributionReleaseNotes = "change_log_external.txt"
+        ext.betaDistributionApkFilePath = "${buildDir}/outputs/apk/internal/release/app-external-release.apk"
+        ext.betaDistributionGroupAliases = "testing-group-setup-ci"
+    }
+
+    internal {
+        dimension "default"
+        ext.betaDistributionReleaseNotes = "change_log_internal.txt"
+        ext.betaDistributionApkFilePath = "${buildDir}/outputs/apk/external/release/app-internal-release.apk"
+        ext.betaDistributionGroupAliases = "testing-group-setup-ci"
+    }
+    }
+```
+# License
+
+Copyright 2019 Danylo Volokh
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
