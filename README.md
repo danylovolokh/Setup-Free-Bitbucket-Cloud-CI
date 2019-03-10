@@ -199,14 +199,231 @@ definitions:
 ```
 
 Then you have to "Enable Bitbucket in the Settings of your account.
+
 ![alt tag](https://user-images.githubusercontent.com/2686355/54084947-8df32180-4340-11e9-9991-8133f939394a.gif)
 
-You also need to add a few variables to the Pipelines variables
+You also need to add a few variables to the "Repository variables" of the Pipelines section in the Settings.
 - BITBUCKET_USER - user which has access to write to the master branch
 - BITBUCKET_PASS - pasword to this user (password will be encrypted and hidden from everyone else)
 - BITBUCKET_ACCOUNT - account on which the repository is stored
 - GIT_REPO_NAME - name of the repository
 
+The values above will be used to access the git repository.
+
 ![alt tag](https://user-images.githubusercontent.com/2686355/54085140-00650100-4343-11e9-8e1a-f60a952f41b7.png)
 
-## Now you are ready to build the "debug" version with Bitbucket Pipelines
+# Now you are ready to build the "debug" version with Bitbucket Pipelines
+# Additional steps
+## 6. Sign the application with the "release" signing key.
+
+This is a tricky moment because you need to give the Pipelines an access to your signing key but do not commit it into the repository. The signing key should not be available to all the team members that have access to the repository.
+
+In order to download the signing key into the repository only for the builds with Bitbucket Pipelines we need to create a "secret repository" as a git submodule. This repository will be located in "signing_info_from_another_repository".
+
+1. Create a separate repository with 2 files in the root of the project.
+"*playstore.properties*":
+```
+storeFile=keystore_file
+storePassword=store_password
+keyAlias=key
+keyPassword=jeyPassword
+```
+"*keystore_file*":
+This is a keystore file with your signing key.
+
+![alt_tag](https://user-images.githubusercontent.com/2686355/54085385-3788e180-4346-11e9-8e2b-13c065c95e92.png)
+
+2. Now we have to add this repository as a git submodule.
+> git submodule add <url> signing_info_from_another_repository
+    
+3. Add signing configuration to the "*app/build.gradle file*"
+
+Add this to the top of the "*app/build.gradle file*"
+```
+def signingPropertiesFile = new File('./signing_info_from_another_repo/playstore.properties')
+def keystoreProperties = new Properties()
+if (signingPropertiesFile && signingPropertiesFile.isFile()) {
+    println "signingPropertiesFile.isFile()"
+    keystoreProperties.load(new FileInputStream(signingPropertiesFile))
+}
+```
+Add signing cofig to the "*android*" closure:
+```
+android {
+    signingConfigs {
+        debug {
+
+        }
+        release {
+            def keystoreFilePath = "${rootDir}/signing_info_from_another_repo/${keystoreProperties['storeFile']}"
+            storeFile = file(keystoreFilePath)
+            storePassword = keystoreProperties['storePassword']
+            keyAlias = keystoreProperties['keyAlias']
+            keyPassword = keystoreProperties['keyPassword']
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}
+```
+4. Update *bitbucket-pipelines.yml* file:
+
+Add following code which will clone the Signing Configuration for the build:
+```
+# Download signing key
+- echo "Download signing key"
+- git config --file=.gitmodules submodule.signing_info_from_another_repo.url https://$BITBUCKET_USER:$BITBUCKET_PASS@bitbucket.org/$BITBUCKET_ACCOUNT/$SIGNING_REPO_NAME.git
+- git submodule sync
+- git submodule update --init signing_info_from_another_repo
+```
+But this code used following variables:
+- BITBUCKET_USER - already added above
+- BITBUCKET_PASS - already added above
+- BITBUCKET_ACCOUNT - already added above
+- SIGNING_REPO_NAME - name to the signing repo name
+
+![alt_tag](https://user-images.githubusercontent.com/2686355/54085584-643df880-4348-11e9-9c60-1596555c2bef.png)
+
+5. change "assembleDebug" to "assembleRelease"
+Here is an updated *bitbucket-pipelines.yml* file
+
+```
+pipelines:
+  custom:
+    manual_configuration:
+      - step:
+          name: Build a version
+          image: java:8
+          caches:
+            - gradle
+            - android-sdk
+            - pip
+          script:
+
+            # Download and unzip android sdk
+            ...
+            
+            # Define Android Home and add PATHs
+            ...
+            
+            # Download packages.
+            ...
+            
+            # Install python
+            ...
+            
+            # Give write access
+            - chmod a+x ./gradlew
+            
+            # Clean the project
+            - ./gradlew clean
+           
+            # Setup correct origin url
+            ...
+
+            # Change build version
+            ...
+
+            # Update application version in gradle file
+            ...
+
+            # Change build version after successful build
+            ...
+
+            # Collect change log
+            ...
+
+            # Download signing key
+            - echo "Download signing key"
+            - git config --file=.gitmodules submodule.signing_info_from_another_repo.url https://$BITBUCKET_USER:$BITBUCKET_PASS@bitbucket.org/$BITBUCKET_ACCOUNT/$SIGNING_REPO_NAME.git
+            - git submodule sync
+            - git submodule update --init signing_info_from_another_repo
+
+            # Build apk
+            - ./gradlew assembleRelease
+
+definitions:
+    caches:
+      android-sdk: android-sdk
+```
+# Now you are ready to build the "release" version with Bitbucket Pipelines
+# Additional steps
+## 7. Upload the apk files to the storage for future usage.
+
+We can use the Downloadds folder of bitbucket cloud to keep the artifacts of our build.
+### To upload the apk files of all the flavors we need to execute python script *6_upload_apk_file_to_bitbucket_downloads.py*
+
+This file used default bitbucket API to upload files into the repository.
+In order to do that we need:
+
+1. Add one Environment variable to the Account Setting (not the repository settings)
+![alt_tag](https://user-images.githubusercontent.com/2686355/54085723-a451ab00-4349-11e9-8a8e-d0c60c5454d7.png)
+- BB_AUTH_STRING - this variabel consists from the account and password separated by the colon ":"
+
+2. Call "*6_upload_apk_file_to_bitbucket_downloads.py*" from *bitbucket-pipelines.yml*
+Here is an updated *bitbucket-pipelines.yml* file:
+```
+pipelines:
+  custom:
+    manual_configuration:
+      - step:
+          name: Build a version
+          image: java:8
+          caches:
+            - gradle
+            - android-sdk
+            - pip
+          script:
+
+            # Download and unzip android sdk
+            ...
+            
+            # Define Android Home and add PATHs
+            ...
+            
+            # Download packages.
+            ...
+            
+            # Install python
+            ...
+            
+            # Give write access
+            - chmod a+x ./gradlew
+            
+            # Clean the project
+            - ./gradlew clean
+           
+            # Setup correct origin url
+            ...
+
+            # Change build version
+            ...
+
+            # Update application version in gradle file
+            ...
+
+            # Change build version after successful build
+            ...
+
+            # Collect change log
+            ...
+
+            # Download signing key
+            ...
+
+            # Build apk
+            - ./gradlew assembleRelease
+            
+            # Upload apk files to bitbucket cloud Downloads folder
+            - echo "Upload apk files to bitbucket cloud Downloads folder"
+            - python 6_upload_apk_file_to_bitbucket_downloads.py
+
+definitions:
+    caches:
+      android-sdk: android-sdk
+            
+```
+
