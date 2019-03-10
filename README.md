@@ -1,6 +1,6 @@
-# How to setup a Free CI for Android project based on bitbucket cloud pipelines.
+# How to setup a Free CI for Android project based on Bitbucket Cloud Pipelines.
 
-This project is created as a "manual" for setting up a FREE CI (Continious Intergation) based on [bitbucket pipelines](https://bitbucket.org/product/features/pipelines)
+This project is created as a "manual" for setting up a FREE CI (Continious Intergation) based on [Bitbucket Pipelines](https://bitbucket.org/product/features/pipelines)
 
 At the time of writting (10.03.2019) **bitbucket cloud offers you a free 50 build minutes** to get started with Pipelines. 
 
@@ -49,23 +49,22 @@ Example:
 - **build_number**        - this value is a build number
 - **build_date**          - date, when this build was created
 - **previous_build_date** - the date of previous build
-- **application_name**    - name of the application
-- **application_version** - version of the application which will be added to the build.gradle file
+- **application_name**    - to change the application name, change this value
+- **application_version** - to change the application version (example: from 1.1 to 2.0) you need to change this value
 - **build_tag**           - a tag name which will be added to the repository when build is created
 - **previous_build_tag**  - a tag which was added when previoud build was created 
 - **repo_url**            - link to the repository
-- **git_branch**          -  branch on which the build is happening
+- **git_branch**          - to work on a different branch besides master you need to change this value
 
 ### To update the *build_info.json* we need to execute python script *1_update_build_info_json.py*
-
 > The file *1_update_build_info_json.py* is located in the root of the project.
 
 This script makes following changes to the *build_info.json*:
-- increments build_number
-- changes build_date to the current date
-- updates previous build date
-- updates build tag
-- updates previous build tag
+- increments **build_number**
+- changes **build_date** to the current date
+- updates **previous_build_date**
+- updates **build_tag**
+- updates **previous_build_tag**
 
 ## 2. Update build.gradle
 
@@ -92,7 +91,6 @@ ext {
 ``` 
 
 ### To update *versionNameValue* and *versionCode* in the *build.gradle* we need to execute python script *2_update_gradle_build_version.py*
-
 > The file *2_update_gradle_build_version.py* is located in the root of the project.
 
 This script takes the *application_name* and *application_version* from *build_info.json*, creates a *versionNameValue*  and adds it to the root *build.gradle*. Values in the root *build.gradle* are used as *versionName* and *versionCode* in the *build.gradle* of the "app" module.
@@ -107,6 +105,7 @@ Please note: we do not commit "build.gradle" files. We only modify the *build_in
 
 ## 4. Collect a change log
 ### To collect the change log we need to execute python script *4_collect_change_log.py*
+> The file *4_collect_change_log.py* is located in the root of the project.
 
 Change contains all the commit messages from the commits between this build and the previous build.
 
@@ -116,9 +115,7 @@ After you run *4_collect_change_log.py* 2 new files will be created in the root 
 - change_log_external.txt
 - change_log_internal.txt
 
-> The file *4_collect_change_log.py* is located in the root of the project.
-
-Change log is collected between the "*build_tag*" and "*previous_build_tag*".
+Change log is collected between the *build_tag* and *previous_build_tag*.
 Example of the *change_log_external.txt*
 ```
 External
@@ -131,8 +128,9 @@ External
 ```
 
 ## 5. Build the application
-Now we are ready to build a "debug" version with bitbucket CI.
+Now we are ready to build a "debug" version with bitbucket CI. To be able to build "release" version we need to setup signing key.
 In order to build the "debug" version we need to call "./gradlew assembleDebug"
+> ./gradlew assembleDebug
 
 # Setup Bitbucket pipelines.
 References:
@@ -211,7 +209,7 @@ definitions:
       android-sdk: android-sdk
 ```
 
-Then you have to "Enable Bitbucket in the Settings of your account.
+Then you have to "Enable Bitbucket in the Settings of your account "Settings > Pipelines".
 
 ![alt tag](https://user-images.githubusercontent.com/2686355/54084947-8df32180-4340-11e9-9991-8133f939394a.gif)
 
