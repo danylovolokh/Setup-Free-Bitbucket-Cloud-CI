@@ -1,0 +1,3 @@
+[submodule "signing_info_from_another_repo"]
+	path = signing_info_from_another_repo
+	url = https://DanyloVolokh@bitbucket.org/DanyloVolokh/setupbitbucketcloudcisigning.git
