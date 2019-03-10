@@ -12,6 +12,11 @@ At the time of writting (10.03.2019) **bitbucket cloud offers you a free 50 buil
 5. Build the application
 6. Upload the apk files to the storage for future usage.
 
+Additional steps:
+
+7. Sign the application with the "release" signing key.
+8. Upload a version to the Fabric Beta for testing purposes.
+
 ## 1. Update build number, build version name etc...
 We will use a separate file to keep the build history: build_info.json
 
@@ -41,7 +46,7 @@ Example:
 - **repo_url**            - link to the repository
 - **git_branch**          -  branch on which the build is happening
 
-### In order to update the *build_info.json* we need to execute python script *1_update_build_info_json.py*
+### To update the *build_info.json* we need to execute python script *1_update_build_info_json.py*
 
 > ##### The file *1_update_build_info_json.py* is located in the root of the project.
 
@@ -76,7 +81,7 @@ You also need to change the *build.gradle* in the app module.
 ``` 
     
 
-### In order to update *versionNameValue* and *versionCode* in the *build.gradle* we need to execute python script *2_update_gradle_build_version.py*
+### To update *versionNameValue* and *versionCode* in the *build.gradle* we need to execute python script *2_update_gradle_build_version.py*
 
 > ##### The file *2_update_gradle_build_version.py* is located in the root of the project.
 
@@ -86,5 +91,28 @@ This script takes the "*application_name*" and "*application_version*" from *bui
 > ##### versionCodeValue = build_number
 
 ## 3. Commit and push changes to the repository
-### In order to commit the changes to build_info.json we need to execute python script *3_commit_build_version.py*
+### To commit the changes to build_info.json we need to execute python script *3_commit_build_version.py*
 Please note: we do not commit "build.gradle" files. We only modify the *build_info.json*
+
+## 4. Collect a change log
+### To collect the change log we need to execute python script *4_collect_change_log.py*
+
+Change contains all the commit messages from the commits between this build and the previous build.
+
+In this project we create a separate change log files for every flavor of the application. Then these separate change logs can be used as a "Release Notes" when we upload different versions to the Fabric. Because the only way to distinguish "flavors" in Fabric Beta "Release notes" is to have different release notes, we create separate change log files for each flavor.
+
+After you run *4_collect_change_log.py* 2 new files will be created in the root of the project:
+- change_log_external.txt
+- change_log_internal.txt
+
+Change log is collected between the "*build_tag*" and "*previous_build_tag*".
+Example of the *change_log_external.txt*
+```
+External
+
+"Added how to commit changes"
+"Added how to update build.gradle file"
+"Added initial Readme file"
+"Fix files that were committed by mistake"
+"Update upload to Downloads"
+```
