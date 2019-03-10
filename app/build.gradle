@@ -4,7 +4,7 @@ apply plugin: 'com.android.application'
 def signingPropertiesFile = new File('./signing_info_from_another_repo/playstore.properties')
 def keystoreProperties = new Properties()
 if (signingPropertiesFile && signingPropertiesFile.isFile()) {
-    println "test signingPropertiesFile.isFile()"
+    println "signingPropertiesFile.isFile()"
     keystoreProperties.load(new FileInputStream(signingPropertiesFile))
 }
 
@@ -22,23 +22,25 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
 
     signingConfigs {
         debug {
 
         }
         release {
-            def keystoreFilePath = "${rootDir}/signing/${keystoreProperties['storeFile']}"
+            def keystoreFilePath = "${rootDir}/signing_info_from_another_repo/${keystoreProperties['storeFile']}"
             storeFile = file(keystoreFilePath)
             storePassword = keystoreProperties['storePassword']
             keyAlias = keystoreProperties['keyAlias']
             keyPassword = keystoreProperties['keyPassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
