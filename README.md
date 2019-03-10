@@ -41,7 +41,7 @@ Example:
 - **repo_url**            - link to the repository
 - **git_branch**          -  branch on which the build is happening
 
-In order to update the *build_info.json* we need to execute python script *1_update_build_info_json.py*
+### In order to update the *build_info.json* we need to execute python script *1_update_build_info_json.py*
 
 > ##### The file *1_update_build_info_json.py* is located in the root of the project.
 
@@ -76,7 +76,7 @@ You also need to change the *build.gradle* in the app module.
 ``` 
     
 
-In order to update *versionNameValue* and *versionCode* in the *build.gradle* we need to execute python script *2_update_gradle_build_version.py*
+### In order to update *versionNameValue* and *versionCode* in the *build.gradle* we need to execute python script *2_update_gradle_build_version.py*
 
 > ##### The file *2_update_gradle_build_version.py* is located in the root of the project.
 
@@ -84,3 +84,7 @@ This script takes the "*application_name*" and "*application_version*" from *bui
 
 > ##### versionNameValue = application_version + '.' + build_number
 > ##### versionCodeValue = build_number
+
+## 3. Commit and push changes to the repository
+### In order to commit the changes to build_info.json we need to execute python script *3_commit_build_version.py*
+Please note: we do not commit "build.gradle" files. We only modify the *build_info.json*
