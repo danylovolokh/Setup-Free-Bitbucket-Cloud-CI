@@ -7,18 +7,18 @@ At the time of writting (10.03.2019) **bitbucket cloud offers you a free 50 buil
 # Steps build a version with CI server
 1. Update build number, build version name etc...
 2. Update build.gradle
-3. Commit
-4. Collect change log
+3. Commit and push changes to the repository
+4. Collect a change log
 5. Build the application
 6. Upload the apk files to the storage for future usage.
 
 ## 1. Update build number, build version name etc...
 We will use a separate file to keep the build history: build_info.json
 
-> ##### The file *build_info.json* is located in the root of this repository
+> ##### The file *build_info.json* is located in the root of the project.
 
 Example:
-```
+```javascript
 {
 "build_number":"13",
 "build_date":"2019-03-10 09:36",
@@ -43,7 +43,7 @@ Example:
 
 In order to update the *build_info.json* we need to execute python script *1_update_build_info_json.py*
 
-> ##### The file *1_update_build_info_json.py* is located in the root of this repository
+> ##### The file *1_update_build_info_json.py* is located in the root of the project.
 
 This script does the following changes to the *build_info.json*:
 - increments build_number
@@ -54,4 +54,33 @@ This script does the following changes to the *build_info.json*:
 
 ## 2. Update build.gradle
 
-In order to update build.gradle file of the app module I've added a few changes to the root build.gradle
+In order to update build.gradle file of the app module I've added a few changes to the root build.gradle. 
+
+Add the following piece of code to the *build.gradle* in the root of the project.
+> ##### The file *build.gradle* is located in the root of the project.
+```
+ext {
+    versionCodeValue = 9999
+    versionNameValue = "debugApplication"
+}
+```
+You also need to change the *build.gradle* in the app module.
+> ##### The file *build.gradle* is located in the "app" folder of the project.
+```
+   defaultConfig {
+        ...
+        versionName versionNameValue
+        versionCode versionCodeValue
+        ...
+    }
+``` 
+    
+
+In order to update *versionNameValue* and *versionCode* in the *build.gradle* we need to execute python script *2_update_gradle_build_version.py*
+
+> ##### The file *2_update_gradle_build_version.py* is located in the root of the project.
+
+This script takes the "*application_name*" and "*application_version*" from *build_info.json*, creates a *versionNameValue*  and adds it to the *build.gradle* which is located in the root of the project. And values in the root of the project are used as *versionName* and *versionCode* in the *build.gradle* of the app module.
+
+> ##### versionNameValue = application_version + '.' + build_number
+> ##### versionCodeValue = build_number
