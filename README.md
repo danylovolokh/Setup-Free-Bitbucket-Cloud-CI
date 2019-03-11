@@ -480,6 +480,14 @@ productFlavors {
     }
     }
 ```
+# Run the CI
+
+We are all set. Now we can easily run our build server from the bitbucket page:
+![run_ci](https://user-images.githubusercontent.com/2686355/54131502-25c53e00-441b-11e9-9161-1fe996298130.gif)
+
+Successful build
+![success](https://user-images.githubusercontent.com/2686355/54131659-763c9b80-441b-11e9-81e1-2d4b602e8fd1.png)
+
 # License
 
 Copyright 2019 Danylo Volokh
