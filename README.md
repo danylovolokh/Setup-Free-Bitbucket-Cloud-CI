@@ -467,14 +467,14 @@ productFlavors {
 
     external {
         dimension "default"
-        ext.betaDistributionReleaseNotes = "change_log_external.txt"
+        ext.betaDistributionReleaseNotesFilePath = "change_log_external.txt"
         ext.betaDistributionApkFilePath = "${buildDir}/outputs/apk/internal/release/app-external-release.apk"
         ext.betaDistributionGroupAliases = "testing-group-setup-ci"
     }
 
     internal {
         dimension "default"
-        ext.betaDistributionReleaseNotes = "change_log_internal.txt"
+        ext.betaDistributionReleaseNotesFilePath = "change_log_internal.txt"
         ext.betaDistributionApkFilePath = "${buildDir}/outputs/apk/external/release/app-internal-release.apk"
         ext.betaDistributionGroupAliases = "testing-group-setup-ci"
     }
