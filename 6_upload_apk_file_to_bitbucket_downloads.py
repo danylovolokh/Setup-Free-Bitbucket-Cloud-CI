@@ -38,8 +38,9 @@ def main(argv):
 
     build_number              = build_info.build_number
     application_version       = build_info.application_version
+    application_name          = build_info.application_name
 
-    version_name = application_version + "_" + application_version.replace(".", "_")
+    version_name = application_name + "_" + application_version.replace(".", "_")
     print ("version_name %s" % version_name)
 
     final_version_name = version_name + "_" + build_number
