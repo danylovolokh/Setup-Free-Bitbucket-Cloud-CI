@@ -1,8 +1,8 @@
 # How to setup a Free CI for Android project based on Bitbucket Cloud Pipelines.
 
-This project is created as a "manual" for setting up a FREE CI (Continious Intergation) based on [Bitbucket Pipelines](https://bitbucket.org/product/features/pipelines)
+This project is created as a "manual" for setting up a FREE CI (Continuous Integration) based on [Bitbucket Pipelines](https://bitbucket.org/product/features/pipelines)
 
-At the time of writting (10.03.2019) **bitbucket cloud offers you a free 50 build minutes** to get started with Pipelines. 
+At the time of writing (10.03.2019) **bitbucket cloud offers you a free 50 build minutes** to get started with Pipelines. 
 
 ## List of files needed in this project to setup CI
 - ./build_info.json
