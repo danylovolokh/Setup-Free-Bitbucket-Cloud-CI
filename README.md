@@ -144,7 +144,7 @@ pipelines:
     manual_configuration:
       - step:
           name: Build a version
-          image: java:8
+          image: openjdk:8
           caches:
             - gradle
             - android-sdk
@@ -308,7 +308,7 @@ pipelines:
     manual_configuration:
       - step:
           name: Build a version
-          image: java:8
+          image: openjdk:8
           caches:
             - gradle
             - android-sdk
